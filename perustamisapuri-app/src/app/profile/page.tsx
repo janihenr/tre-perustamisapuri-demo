@@ -7,8 +7,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Download, Edit, MessageSquare, FileText, User, Bot } from "lucide-react";
+import { Download, Edit, MessageSquare, FileText, User, Bot, LogOut } from "lucide-react";
 import Link from "next/link";
+import { clearAuthCookie } from "@/lib/auth";
+import { useRouter } from "next/navigation";
+import { AuthGuard } from "@/components/auth-guard";
 
 interface Message {
   id: string;
@@ -20,6 +23,7 @@ interface Message {
 export default function ProfilePage() {
   const [profile, setProfile] = useState<Record<string, unknown> | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     // Load profile data
@@ -43,6 +47,13 @@ export default function ProfilePage() {
     alert("PDF-lataus tulossa - tämä on demo-versio");
   };
 
+  const handleLogout = () => {
+    if (confirm('Haluatko varmasti kirjautua ulos? Sinut ohjataan takaisin sisäänkirjautumissivulle.')) {
+      clearAuthCookie();
+      router.push('/');
+    }
+  };
+
   if (!profile) {
     return (
       <div className="container max-w-4xl py-8">
@@ -60,7 +71,8 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="container max-w-4xl py-8 bg-background/80 backdrop-blur-sm rounded-lg my-4">
+    <AuthGuard>
+      <div className="container max-w-4xl py-8 bg-background/80 backdrop-blur-sm rounded-lg my-4">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Yrittäjäprofiili</h1>
@@ -78,6 +90,10 @@ export default function ProfilePage() {
               <Edit className="h-4 w-4 mr-2" />
               Muokkaa
             </Link>
+          </Button>
+          <Button variant="secondary" onClick={handleLogout}>
+            <LogOut className="h-4 w-4 mr-2" />
+            Kirjaudu ulos
           </Button>
         </div>
       </div>
@@ -256,6 +272,7 @@ export default function ProfilePage() {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </AuthGuard>
   );
 }

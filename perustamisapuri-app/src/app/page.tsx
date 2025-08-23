@@ -1,24 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle } from "lucide-react";
+import { validateSecretKey, setAuthCookie, isAuthenticated } from "@/lib/auth";
 
 export default function Home() {
   const [signinKey, setSigninKey] = useState("");
   const [showErrorModal, setShowErrorModal] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Check if user is already authenticated
+  useEffect(() => {
+    if (isAuthenticated()) {
+      const redirectTo = searchParams.get('redirect') || '/onboarding';
+      router.push(redirectTo);
+    }
+  }, [router, searchParams]);
 
   const handleSigninKeySubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (signinKey === "TampereNetum2025") {
-      router.push("/onboarding");
+    if (validateSecretKey(signinKey)) {
+      // Set authentication cookie
+      setAuthCookie();
+      
+      // Redirect to intended page or onboarding
+      const redirectTo = searchParams.get('redirect') || '/onboarding';
+      router.push(redirectTo);
     } else {
       // Show error modal and reset the input
       setShowErrorModal(true);
@@ -35,6 +50,13 @@ export default function Home() {
           <p className="mt-2 text-muted-foreground">
             Digitaalinen avustaja yrittäjyydelle Tampereella
           </p>
+          {searchParams.get('redirect') && (
+            <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg">
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                🔒 Kirjaudu sisään päästäksesi sovellukseen
+              </p>
+            </div>
+          )}
           <Badge variant="secondary" className="mt-4">
             Demo-versio
           </Badge>

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateChatResponse, generateChatResponseStream, ChatMessage } from '@/lib/openai';
+import { generateChatResponse, generateChatResponseStream, generatePreworkMessage, ChatMessage } from '@/lib/openai';
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,6 +18,30 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const { message, profile, history, stream } = body;
+
+    // Handle prework message generation
+    if (message === 'GENERATE_PREWORK') {
+      if (!profile) {
+        return NextResponse.json(
+          { error: 'Profiilitiedot puuttuvat prework-viestin luomiseen.' },
+          { status: 400 }
+        );
+      }
+      
+      try {
+        const preworkMessage = await generatePreworkMessage(profile);
+        return NextResponse.json({
+          message: preworkMessage,
+          timestamp: new Date().toISOString()
+        });
+      } catch (error) {
+        console.error('Prework generation error:', error);
+        return NextResponse.json(
+          { error: 'Virhe prework-viestin luomisessa.' },
+          { status: 500 }
+        );
+      }
+    }
 
     // Validate input
     if (!message || typeof message !== 'string') {

@@ -8,7 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Zap, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Zap, Sparkles, LogOut } from "lucide-react";
+import { clearAuthCookie } from "@/lib/auth";
+import { useRouter } from "next/navigation";
+import { AuthGuard } from "@/components/auth-guard";
 
 export default function OnboardingPage() {
   const [formData, setFormData] = useState({
@@ -20,6 +23,7 @@ export default function OnboardingPage() {
     goals: ""
   });
   const [isGenerating, setIsGenerating] = useState(false);
+  const router = useRouter();
 
   // Demo data constants
   const demoData = {
@@ -55,6 +59,13 @@ Liiketoiminnan tavoitteet eivät rajoitu vain liikevaihtoon, vaan myös asiakasa
     e.preventDefault();
     // In a real app, this would save to database
     localStorage.setItem('perustamisapuri-profile', JSON.stringify(formData));
+    
+    // Clear any existing chat messages to start fresh
+    localStorage.removeItem('perustamisapuri-messages');
+    
+    // Set a flag to indicate this is a fresh form submission
+    localStorage.setItem('perustamisapuri-fresh-start', 'true');
+    
     window.location.href = '/chat';
   };
 
@@ -97,29 +108,39 @@ Liiketoiminnan tavoitteet eivät rajoitu vain liikevaihtoon, vaan myös asiakasa
     }
   };
 
-  return (
-    <div className="container max-w-2xl py-8">
-      <div className="mb-8">
-        <Button variant="ghost" asChild>
-          <Link href="/" className="flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Takaisin
-          </Link>
-        </Button>
-      </div>
+  const handleLogout = () => {
+    if (confirm('Haluatko varmasti kirjautua ulos? Sinut ohjataan takaisin sisäänkirjautumissivulle.')) {
+      clearAuthCookie();
+      router.push('/');
+    }
+  };
 
-      <div className="space-y-8">
-        <div className="text-center">
-          <Badge variant="secondary" className="mb-4">
-            Vaihe 1/1
-          </Badge>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Kerro itsestäsi
-          </h1>
-          <p className="mt-2 text-muted-foreground">
-            Näiden tietojen avulla Perustamisapuri voi auttaa sinua paremmin
-          </p>
+  return (
+    <AuthGuard>
+      <div className="min-h-screen flex flex-col">
+      <div className="container max-w-2xl mx-auto px-4 py-8 flex-1">
+        <div className="mb-8 flex justify-between items-center">
+          <Button variant="ghost" asChild>
+            <Link href="/" className="flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Takaisin
+            </Link>
+          </Button>
+          <Button variant="secondary" onClick={handleLogout} className="flex items-center gap-2">
+            <LogOut className="h-4 w-4" />
+            Kirjaudu ulos
+          </Button>
         </div>
+
+        <div className="space-y-8">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold tracking-tight">
+              Kerro itsestäsi
+            </h1>
+            <p className="mt-2 text-muted-foreground">
+              Näiden tietojen avulla Perustamisapuri voi auttaa sinua paremmin
+            </p>
+          </div>
 
         <Card className="border-2 shadow-lg bg-card/95 backdrop-blur-sm">
           <CardHeader>
@@ -285,7 +306,9 @@ Liiketoiminnan tavoitteet eivät rajoitu vain liikevaihtoon, vaan myös asiakasa
             </form>
           </CardContent>
         </Card>
-      </div>
-    </div>
-  );
-}
+                 </div>
+       </div>
+       </div>
+    </AuthGuard>
+   );
+ }

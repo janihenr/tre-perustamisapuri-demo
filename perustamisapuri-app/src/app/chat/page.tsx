@@ -6,9 +6,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Send, User, Bot, Trash2, RotateCcw } from "lucide-react";
+import { Send, User, Bot, Trash2, RotateCcw, LogOut, FileText } from "lucide-react";
 import Link from "next/link";
 import ReactMarkdown from 'react-markdown';
+import { clearAuthCookie } from "@/lib/auth";
+import { useRouter } from "next/navigation";
+import { AuthGuard } from "@/components/auth-guard";
 
 interface Message {
   id: string;
@@ -25,6 +28,60 @@ export default function ChatPage() {
   const [error, setError] = useState<string | null>(null);
   const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  const generatePreworkWelcome = async (profileData: Record<string, unknown>) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: 'GENERATE_PREWORK',
+          profile: profileData,
+          history: [],
+          stream: false
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        const welcomeMessage: Message = {
+          id: "prework-welcome",
+          content: data.message,
+          role: "assistant",
+          timestamp: new Date()
+        };
+        setMessages([welcomeMessage]);
+      } else {
+        // Fallback to simple welcome if prework generation fails
+        const fallbackMessage: Message = {
+          id: "fallback-welcome",
+          content: `Tervetuloa Perustamisapuriin, ${profileData.name || 'yrittäjä'}! 
+
+Kiitos antamistasi tiedoista. Aloitetaan keskustelu liikeideasi kehittämisestä. Mistä haluaisit aloittaa?`,
+          role: "assistant",
+          timestamp: new Date()
+        };
+        setMessages([fallbackMessage]);
+      }
+    } catch (error) {
+      console.error('Prework generation error:', error);
+      // Fallback message
+      const fallbackMessage: Message = {
+        id: "error-welcome",
+        content: `Tervetuloa Perustamisapuriin! Aloitetaan keskustelu liikeideasi kehittämisestä.`,
+        role: "assistant",
+        timestamp: new Date()
+      };
+      setMessages([fallbackMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Load profile data
@@ -33,36 +90,54 @@ export default function ChatPage() {
       setProfile(JSON.parse(savedProfile));
     }
 
-    // Load chat history
-    const savedMessages = localStorage.getItem('perustamisapuri-messages');
-    if (savedMessages) {
-      setMessages(JSON.parse(savedMessages).map((msg: any) => ({
-        ...msg,
-        timestamp: new Date(msg.timestamp)
-      })));
+    // Check if this is a fresh start from form submission
+    const isFreshStart = localStorage.getItem('perustamisapuri-fresh-start');
+    
+    if (isFreshStart) {
+      // Clear the fresh start flag
+      localStorage.removeItem('perustamisapuri-fresh-start');
+      
+      // Always generate fresh prework message when coming from form
+      if (savedProfile) {
+        const profileData = JSON.parse(savedProfile);
+        generatePreworkWelcome(profileData);
+      } else {
+        // Fallback if no profile somehow
+        const welcomeMessage: Message = {
+          id: "welcome-no-profile",
+          content: `Tervetuloa Perustamisapuriin! Aloitetaan keskustelu liikeideasi kehittämisestä.`,
+          role: "assistant",
+          timestamp: new Date()
+        };
+        setMessages([welcomeMessage]);
+      }
     } else {
-      // Welcome message
-      const welcomeMessage: Message = {
-        id: "welcome",
-        content: profile?.name 
-          ? `Tervetuloa takaisin, ${profile.name}! 
-
-${profile.businessIdea ? `Muistan että suunnittelet: "${profile.businessIdea}"` : ''}
-${profile.municipality && profile.municipality !== 'tampere' ? `Ja että asut ${profile.municipality}ssa.` : ''}
-${profile.goals ? `Tavoitteenasi on: ${profile.goals}` : ''}
-
-Jatketaan yrittäjyysmatkaasi! Mistä aiheesta haluaisit keskustella tänään? Voin auttaa esimerkiksi:
-• Liiketoimintasuunnitelman kehittämisessä
-• Lupien ja säädösten selvittämisessä  
-• Rahoitusvaihtoehtojen kartoittamisessa
-• Markkinoinnin suunnittelussa`
-          : `Tervetuloa Perustamisapuriin! Olen täällä auttamassa sinua yrittäjyyden alkutaipaleella Tampereella. 
+      // Normal flow - load existing chat history or show default welcome
+      const savedMessages = localStorage.getItem('perustamisapuri-messages');
+      if (savedMessages) {
+        setMessages(JSON.parse(savedMessages).map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp)
+        })));
+      } else {
+        // Check if user just came from form (has profile but no messages)
+        if (savedProfile) {
+          const profileData = JSON.parse(savedProfile);
+          // Generate prework message for new users with profile
+          generatePreworkWelcome(profileData);
+        } else {
+          // Standard welcome message for users without profile
+          const welcomeMessage: Message = {
+            id: "welcome",
+            content: `Tervetuloa Perustamisapuriin! Olen täällä auttamassa sinua yrittäjyyden alkutaipaleella Tampereella. 
 
 Aloitetaan tutustumalla sinuun ja liikeideasiisi. Kerro ensiksi: **Mikä on nimesi ja millaista yritystä suunnittelet?**`,
-        role: "assistant",
-        timestamp: new Date()
-      };
-      setMessages([welcomeMessage]);
+            role: "assistant",
+            timestamp: new Date()
+          };
+          setMessages([welcomeMessage]);
+        }
+      }
     }
   }, []);
 
@@ -258,8 +333,56 @@ Mistä aiheesta haluaisit keskustella?`,
     }
   };
 
+  const handleLogout = () => {
+    if (confirm('Haluatko varmasti kirjautua ulos? Sinut ohjataan takaisin sisäänkirjautumissivulle.')) {
+      clearAuthCookie();
+      router.push('/');
+    }
+  };
+
+  const generateSummary = async () => {
+    if (messages.length < 3) {
+      alert('Keskustelu on liian lyhyt yhteenvedon luomiseen. Keskustele ensin enemmän liikeideasi eri osa-alueista.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/summary', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: messages,
+          profile: profile
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        const summaryMessage: Message = {
+          id: `summary-${Date.now()}`,
+          content: `## 📋 Keskustelun yhteenveto\n\n${data.summary}`,
+          role: "assistant",
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, summaryMessage]);
+      } else {
+        setError(data.error || 'Virhe yhteenvedon luomisessa');
+      }
+    } catch (error) {
+      console.error('Summary generation error:', error);
+      setError('Yhteysongelma palvelimeen');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="flex h-[calc(100vh-3.5rem)]">
+    <AuthGuard>
+      <div className="flex h-[calc(100vh-3.5rem)]">
       {/* Sidebar */}
       <div className="hidden md:flex w-64 border-r bg-background/90 backdrop-blur-sm flex-col">
         <div className="p-4 border-b">
@@ -274,6 +397,17 @@ Mistä aiheesta haluaisit keskustella?`,
           </Link>
         </nav>
         <div className="p-4 border-t space-y-3">
+          <Button 
+            variant="default" 
+            size="sm" 
+            onClick={generateSummary}
+            disabled={isLoading || messages.length < 3}
+            className="w-full flex items-center gap-2"
+            title={messages.length < 3 ? "Keskustele enemmän ennen yhteenvedon luomista" : "Luo yhteenveto keskustelusta"}
+          >
+            <FileText className="h-4 w-4" />
+            Luo yhteenveto
+          </Button>
           <Button 
             variant="outline" 
             size="sm" 
@@ -291,6 +425,15 @@ Mistä aiheesta haluaisit keskustella?`,
           >
             <Trash2 className="h-4 w-4" />
             Tyhjennä istunto
+          </Button>
+          <Button 
+            variant="secondary" 
+            size="sm" 
+            onClick={handleLogout}
+            className="w-full flex items-center gap-2"
+          >
+            <LogOut className="h-4 w-4" />
+            Kirjaudu ulos
           </Button>
           <div className="space-y-2">
             <Badge variant="secondary" className="w-full justify-center">
@@ -410,6 +553,7 @@ Mistä aiheesta haluaisit keskustella?`,
           </p>
         </div>
       </div>
-    </div>
+      </div>
+    </AuthGuard>
   );
 }

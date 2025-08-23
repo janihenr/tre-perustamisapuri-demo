@@ -52,7 +52,12 @@ KESKUSTELUN RAKENNE:
 - Käytä käyttäjän profiilitietoja antaaksesi räätälöityjä neuvoja
 - Anna käytännöllisiä neuvoja Tampereen ja Suomen kontekstissa
 - Viittaa relevantteihin viranomaislähteisiin (PRH, Verohallinto, TE-palvelut)
-- Jos et tiedä jotain liiketoiminta-asiaa, ole rehellinen ja ohjaa oikeisiin lähteisiin`;
+- Jos et tiedä jotain liiketoiminta-asiaa, ole rehellinen ja ohjaa oikeisiin lähteisiin
+
+KESKUSTELUN PÄÄTTÄMINEN:
+- Kun keskustelu on kestänyt jonkin aikaa ja useita aiheita on käsitelty, ehdota käyttäjälle yhteenvedon luomista
+- Sano esimerkiksi: "Olemme käyneet läpi monia tärkeitä aiheita. Haluaisitko että luon yhteenvedon keskustelustamme?"
+- Muistuta että käyttäjä voi lopettaa keskustelun milloin tahansa ja pyytää yhteenvetoa`;
 
   // Add detailed user profile information if available
   if (profile && Object.keys(profile).some(key => profile[key as keyof UserProfile])) {
@@ -149,23 +154,45 @@ export async function generateChatResponseStream(
 
 export async function summarizeConversation(
   messages: ChatMessage[],
-  _profile?: UserProfile
+  profile?: UserProfile
 ): Promise<string> {
   try {
-    const summaryPrompt = `Tee lyhyt yhteenveto tästä yrittäjyyskeskustelusta. Korosta tärkeimmät päätökset ja suunnitelmat. Kirjoita suomeksi ja käytä selkeää rakennetta:
+    const summaryPrompt = `Tee kattava yhteenveto tästä yrittäjyyskeskustelusta. Analysoi keskustelu dimensioittain ja anna käytännöllisiä suosituksia. Kirjoita suomeksi ja käytä seuraavaa rakennetta:
 
-1. Liikeidea
-2. Tärkeimmät päätökset
-3. Seuraavat askeleet
-4. Avoimet kysymykset
+## KESKUSTELUN YHTEENVETO
 
-Keskustelu:
+### LIIKEIDEA
+[Lyhyt kuvaus liikeideasta ja sen kehityksestä keskustelun aikana]
+
+### KÄSITELLYT DIMENSIOT
+[Listaa jokainen käsitelty osa-alue (esim. markkinat, rahoitus, luvat) ja mitä niistä keskusteltiin]
+
+### TÄRKEIMMÄT PÄÄTÖKSET JA OIVALLUKSET
+[Mitä konkreettisia päätöksiä tai oivalluksia syntyi]
+
+### SEURAAVAT ASKELEET
+[Konkreettiset toimenpiteet joita yrittäjän tulisi tehdä]
+
+### LISÄKSI HARKITTAVAT DIMENSIOT
+[Mitkä tärkeät osa-alueet jäivät vielä käsittelemättä ja joita kannattaa pohtia]
+
+### SUOSITUKSET
+[Käytännölliset neuvot ja resurssit]
+
+${profile ? `
+KÄYTTÄJÄN PROFIILI:
+- Nimi: ${profile.name || 'Ei annettu'}
+- Kunta: ${profile.municipality || 'Ei annettu'}
+- Liikeidea: ${profile.businessIdea ? profile.businessIdea.substring(0, 200) + '...' : 'Ei annettu'}
+` : ''}
+
+KESKUSTELU:
 ${messages.map(m => `${m.role === 'user' ? 'Käyttäjä' : 'Apuri'}: ${m.content}`).join('\n\n')}`;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: summaryPrompt }],
-      max_tokens: 300,
+      max_tokens: 800,
       temperature: 0.3,
     });
 
@@ -183,6 +210,59 @@ export interface GeneratedBusinessProfile {
   businessIdea: string;
   experience: string;
   goals: string;
+}
+
+export async function generatePreworkMessage(profile: UserProfile): Promise<string> {
+  try {
+    const prompt = `Sinä olet Perustamisapuri, ystävällinen yrittäjyysasiantuntija. Käyttäjä on juuri täyttänyt lomakkeen ja antanut seuraavat tiedot:
+
+NIMI: ${profile.name || 'Ei annettu'}
+KUNTA: ${profile.municipality || 'Ei annettu'}
+LIIKEIDEA: ${profile.businessIdea || 'Ei annettu'}
+TAUSTA: ${profile.experience || 'Ei annettu'}
+TAVOITTEET: ${profile.goals || 'Ei annettu'}
+
+Luo ystävällinen tervetuloviesti, joka:
+
+1. KIITTÄÄ käyttäjää tiedoista (1 lause)
+2. TEKEE LYHYEN YHTEENVEDON liikeideasta (maksimissaan 2 lausetta)
+3. LISTAA AVAINKOHDAT liikeideasta bullet-muodossa (3-5 kohtaa, esim. • Kohderyhmä, • Kilpailuetu, • Rahoitustarve)
+4. EHDOTTAA KESKUSTELUNAIHEITA (3-4 aihetta bullet-muodossa, esim. • Markkinatutkimus, • Liiketoimintasuunnitelma)
+5. LOPETTAA lauseeseen: "Mistä aiheesta haluaisit aloittaa keskustelun?"
+
+TÄRKEÄÄ:
+- Pidä viesti lyhyenä ja ytimekkäänä (maksimissaan 150 sanaa)
+- Käytä bullet-pisteitä selkeyden vuoksi
+- Älä käytä emojeja
+- Ole ammattimainen mutta lähestyttävä
+
+Muoto:
+Kiitos antamistasi tiedoista, [nimi]! [Lyhyt yhteenveto liikeideasta]
+
+**Avainkohdat liikeideassasi:**
+• [kohta 1]
+• [kohta 2]
+• [kohta 3]
+
+**Ehdotetut keskustelunaiheet:**
+• [aihe 1]
+• [aihe 2]
+• [aihe 3]
+
+Mistä aiheesta haluaisit aloittaa keskustelun?`;
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 400,
+      temperature: 0.7,
+    });
+
+    return completion.choices[0]?.message?.content || 'Tervetuloa Perustamisapuriin! Aloitetaan keskustelu liikeideasi kehittämisestä.';
+  } catch (error) {
+    console.error('OpenAI prework message generation error:', error);
+    throw new Error('Virhe tervetuloviestin luomisessa.');
+  }
 }
 
 export async function generateBusinessIdea(): Promise<GeneratedBusinessProfile> {
