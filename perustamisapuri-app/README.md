@@ -149,6 +149,10 @@ npm run build
 npm start
 ```
 
+## Projektin luonne
+
+**Henkilökohtainen harrastusprojekti**: Tämä on henkilökohtainen harrastusprojekti, joka on kehitetty oppimis- ja kokeilutarkoituksessa. Projekti esittelee digitaalisen avustajan konseptia yrittäjyydelle Tampereella.
+
 ## Tuki ja yhteystiedot
 
 Tämä on demo-projekti Tampereen kaupungin yrittäjäpalveluille.
