@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /
+
+# This prevents all search engines from indexing the site
+# The site is publicly accessible but won't appear in search results

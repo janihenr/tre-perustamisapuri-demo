@@ -1,0 +1,71 @@
+---
+alwaysApply: true
+description: Finnish UX and localization requirements
+---
+
+# Finnish UX Guidelines for Perustamisapuri
+
+## Language Requirements
+- All UI text must be in Finnish
+- Use proper Finnish business terminology
+- Implement Finnish date and number formatting
+- Use formal address form ("Te" instead of "sinä") for professional context
+
+## Key Finnish Terms:
+- **Perustamisapuri**: The AI assistant name
+- **Yrittäjäprofiili**: Business profile
+- **Liikeidea**: Business idea
+- **Tausta ja osaaminen**: Background and expertise
+- **Keskusteluhistoria**: Chat history
+- **Dokumentit**: Documents
+- **Kirjaudu sisään**: Login
+- **Lataa PDF**: Download PDF
+
+## UI Text Examples:
+```typescript
+const finnishTexts = {
+  login: {
+    title: "Tervetuloa Perustamisapuriin",
+    subtitle: "Kirjaudu sisään Suomi.fi-tunnuksilla",
+    button: "Kirjaudu sisään Suomi.fi"
+  },
+  chat: {
+    placeholder: "Kysy mitä tahansa yrittäjyydestä...",
+    send: "Lähetä",
+    thinking: "Apuri miettii..."
+  },
+  profile: {
+    title: "Yrittäjäprofiili",
+    sections: {
+      businessIdea: "Liikeidea",
+      background: "Tausta ja osaaminen",
+      chatHistory: "Keskusteluhistoria",
+      documents: "Dokumentit"
+    },
+    actions: {
+      edit: "Muokkaa",
+      save: "Tallenna",
+      export: "Lataa PDF"
+    }
+  }
+};
+```
+
+## Accessibility (WCAG 2.1)
+- Use semantic HTML elements
+- Implement proper ARIA labels in Finnish
+- Ensure keyboard navigation works
+- Maintain proper color contrast ratios
+- Add alt texts for images in Finnish
+
+## Finnish Business Context
+- Focus on Tampere municipality requirements
+- Include relevant Finnish business permits and licensing info
+- Reference Finnish business registration processes
+- Use Euro (€) currency formatting
+
+## Responsive Design
+- Mobile-first approach
+- Touch-friendly button sizes (min 44px)
+- Readable text sizes on mobile
+- Proper spacing for Finnish text length

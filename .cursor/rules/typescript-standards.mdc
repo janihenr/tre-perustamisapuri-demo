@@ -1,0 +1,69 @@
+---
+globs: *.ts,*.tsx
+description: TypeScript coding standards for the project
+---
+
+# TypeScript Standards for Perustamisapuri
+
+## Code Quality Requirements
+- Always use TypeScript strict mode
+- Define proper interfaces for all data structures
+- Use proper error handling with try-catch blocks
+- Implement proper loading states for async operations
+
+## Required Type Definitions
+```typescript
+// User types
+interface User {
+  id: string;
+  name: string;
+  municipality: string;
+  businessIdea?: string;
+}
+
+// Chat types
+interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
+
+// Profile types
+interface BusinessProfile {
+  userId: string;
+  liikeidea: string;
+  taustaJaOsaaminen: string;
+  keskusteluhistoria: ChatMessage[];
+  dokumentit: string[];
+}
+```
+
+## Component Structure
+- Use functional components with TypeScript
+- Implement proper prop interfaces
+- Use React hooks appropriately
+- Handle loading and error states
+
+## Example Component:
+```tsx
+interface ChatBubbleProps {
+  message: ChatMessage;
+  isUser: boolean;
+}
+
+export function ChatBubble({ message, isUser }: ChatBubbleProps) {
+  return (
+    <Card className={cn("mb-4", isUser ? "ml-auto" : "mr-auto")}>
+      <CardContent className="p-3">
+        <p>{message.content}</p>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+## Finnish Localization
+- All user-facing text in Finnish
+- Use proper Finnish date/time formatting
+- Implement Finnish validation messages

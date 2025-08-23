@@ -1,0 +1,55 @@
+---
+alwaysApply: true
+description: Project structure and architecture guidelines
+---
+
+# Perustamisapuri Project Structure
+
+## Technology Stack
+- **Frontend**: Next.js 14+ with TypeScript
+- **UI Library**: shadcn/ui components (mandatory)
+- **Styling**: Tailwind CSS
+- **Backend**: Node.js + Express
+- **Database**: SQLite for demo
+- **LLM**: OpenAI API (GPT-4o-mini)
+- **Language**: Finnish UI/UX
+
+## Directory Structure
+```
+/
+├── app/                    # Next.js app directory
+│   ├── (auth)/            # Authentication routes
+│   ├── chat/              # Chat interface
+│   ├── profile/           # User profile pages
+│   └── api/               # API routes
+├── components/
+│   ├── ui/                # shadcn/ui components
+│   ├── chat/              # Chat-specific components
+│   ├── profile/           # Profile components
+│   └── layout/            # Layout components
+├── lib/
+│   ├── utils.ts           # Utility functions
+│   ├── openai.ts          # OpenAI integration
+│   └── db.ts              # Database utilities
+├── public/                # Static assets
+└── types/                 # TypeScript type definitions
+```
+
+## Key Pages Required:
+1. **Login Page**: Mock Suomi.fi authentication
+2. **Onboarding**: User info collection
+3. **Chat Interface**: Main conversation with Apuri
+4. **Profile Page**: "Yrittäjäprofiili" with sections:
+   - Liikeidea
+   - Tausta ja osaaminen
+   - Keskusteluhistoria
+   - Dokumentit
+   - PDF export functionality
+
+## API Endpoints:
+- `/api/auth/mock-login` - Simulated authentication
+- `/api/chat` - OpenAI chat integration
+- `/api/profile` - Profile CRUD operations
+- `/api/export/pdf` - PDF generation
+
+Reference the PRD document: [perustamisapuri_demo_prd.md](mdc:PRD/perustamisapuri_demo_prd.md)

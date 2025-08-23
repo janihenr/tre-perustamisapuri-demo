@@ -1,0 +1,113 @@
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { AlertCircle } from "lucide-react";
+
+export default function Home() {
+  const [signinKey, setSigninKey] = useState("");
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const router = useRouter();
+
+  const handleSigninKeySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (signinKey === "TampereNetum2025") {
+      router.push("/onboarding");
+    } else {
+      // Show error modal and reset the input
+      setShowErrorModal(true);
+      setSigninKey("");
+    }
+  };
+  return (
+    <div className="container flex items-center justify-center min-h-[calc(100vh-3.5rem)] py-8">
+      <div className="w-full max-w-md space-y-8">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold tracking-tight">
+            Tervetuloa Perustamisapuriin
+          </h1>
+          <p className="mt-2 text-muted-foreground">
+            Digitaalinen avustaja yrittäjyydelle Tampereella
+          </p>
+          <Badge variant="secondary" className="mt-4">
+            Demo-versio
+          </Badge>
+        </div>
+
+        <Card className="border-2 shadow-lg bg-card/95 backdrop-blur-sm">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl text-center">Kirjaudu sisään</CardTitle>
+            <CardDescription className="text-center">
+              Käytä Suomi.fi-tunnuksia päästäksesi palveluun
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button asChild className="w-full" size="lg">
+              <Link href="/onboarding">
+                Kirjaudu sisään Suomi.fi
+              </Link>
+            </Button>
+            
+            {/* Signin Key Input */}
+            <div className="space-y-2">
+              <form onSubmit={handleSigninKeySubmit} className="space-y-2">
+                <Input
+                  type="text"
+                  placeholder="Syötä sisäänkirjautumisavain..."
+                  value={signinKey}
+                  onChange={(e) => setSigninKey(e.target.value)}
+                  className="w-full"
+                />
+                <Button type="submit" variant="outline" className="w-full" size="sm">
+                  Kirjaudu sisään avaimella
+                </Button>
+              </form>
+            </div>
+            
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">
+                Demo-versio - ei vaadi oikeita tunnuksia
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="text-center text-sm text-muted-foreground bg-background/80 backdrop-blur-sm rounded-lg p-4">
+          <p>
+            Perustamisapuri auttaa sinua yrityksen perustamisessa ja 
+            yrittäjyyden alkutaipaleella Tampereella.
+          </p>
+        </div>
+      </div>
+
+      {/* Error Modal */}
+      <Dialog open={showErrorModal} onOpenChange={setShowErrorModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertCircle className="h-5 w-5" />
+              Virheellinen avain
+            </DialogTitle>
+            <DialogDescription>
+              Syöttämäsi sisäänkirjautumisavain ei ole oikein. Tarkista avain ja yritä uudelleen.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button 
+              onClick={() => setShowErrorModal(false)}
+              className="w-full"
+            >
+              Yritä uudelleen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

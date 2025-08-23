@@ -1,0 +1,57 @@
+---
+globs: **/api/**/*,**/lib/**/*
+description: API integration and backend development guidelines
+---
+
+# API Integration Guidelines
+
+## OpenAI Integration
+- Use GPT-4o-mini for cost efficiency in demo
+- Implement proper error handling for API failures
+- Add loading states during API calls
+- Store API keys in environment variables
+
+## Example OpenAI Setup:
+```typescript
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+export async function getChatResponse(messages: ChatMessage[]) {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      })),
+      max_tokens: 500,
+      temperature: 0.7,
+    });
+    
+    return response.choices[0]?.message?.content || "Anteeksi, en pysty vastaamaan juuri nyt.";
+  } catch (error) {
+    console.error('OpenAI API error:', error);
+    throw new Error('Chat service temporarily unavailable');
+  }
+}
+```
+
+## Database Operations
+- Use SQLite for demo simplicity
+- Implement proper error handling
+- Use prepared statements for security
+- Keep demo data synthetic only
+
+## RAG Implementation
+- Mock knowledge base with JSON data
+- Implement simple vector search simulation
+- Focus on Finnish entrepreneurship content
+- Example topics: licensing, permits, business registration
+
+## Context7 Usage
+- Use Context7 for OpenAI API documentation
+- Reference Next.js and React documentation
+- Look up shadcn/ui component usage examples

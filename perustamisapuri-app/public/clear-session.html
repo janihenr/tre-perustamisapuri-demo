@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tyhjennä istunto - Perustamisapuri</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #f8fafc;
+            color: #334155;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #0f172a;
+            margin-bottom: 1rem;
+        }
+        .button {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            margin: 0.5rem;
+            background: #dc2626;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .button:hover {
+            background: #b91c1c;
+        }
+        .button.secondary {
+            background: #6b7280;
+        }
+        .button.secondary:hover {
+            background: #4b5563;
+        }
+        .success {
+            color: #059669;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+        .info {
+            background: #fef3c7;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            border-left: 4px solid #f59e0b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗑️ Tyhjennä istunnon tiedot</h1>
+        
+        <div class="info">
+            <p><strong>Huomio:</strong> Tämä poistaa kaikki tallennetut tiedot:</p>
+            <ul style="text-align: left; display: inline-block;">
+                <li>Keskusteluhistoria</li>
+                <li>Yrittäjäprofiili</li>
+                <li>Kaikki istunnon tiedot</li>
+            </ul>
+        </div>
+
+        <div id="status"></div>
+
+        <button class="button" onclick="clearAllData()">
+            🗑️ Tyhjennä kaikki tiedot
+        </button>
+        
+        <button class="button secondary" onclick="window.close()">
+            ❌ Peruuta
+        </button>
+
+        <div style="margin-top: 2rem; font-size: 0.9rem; color: #6b7280;">
+            <p>Voit sulkea tämän ikkunan kun olet valmis.</p>
+        </div>
+    </div>
+
+    <script>
+        function clearAllData() {
+            try {
+                // Clear all Perustamisapuri related data
+                localStorage.removeItem('perustamisapuri-messages');
+                localStorage.removeItem('perustamisapuri-profile');
+                
+                // Clear any other session data that might exist
+                const keysToRemove = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.includes('perustamisapuri')) {
+                        keysToRemove.push(key);
+                    }
+                }
+                
+                keysToRemove.forEach(key => localStorage.removeItem(key));
+                
+                // Show success message
+                document.getElementById('status').innerHTML = 
+                    '<div class="success">✅ Istunnon tiedot on tyhjennetty onnistuneesti!</div>' +
+                    '<p>Voit nyt palata sovellukseen. Kaikki tiedot aloitetaan alusta.</p>';
+                    
+                console.log('Session data cleared successfully');
+                
+                // Optionally redirect back to main app after a delay
+                setTimeout(() => {
+                    if (confirm('Haluatko palata Perustamisapuriin?')) {
+                        window.location.href = '/';
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error clearing session data:', error);
+                document.getElementById('status').innerHTML = 
+                    '<div style="color: #dc2626;">❌ Virhe tietojen tyhjentämisessä. Kokeile päivittää sivu ja yritä uudelleen.</div>';
+            }
+        }
+
+        // Auto-clear if URL parameter is set
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('auto') === 'true') {
+            clearAllData();
+        }
+    </script>
+</body>
+</html>

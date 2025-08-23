@@ -1,0 +1,59 @@
+---
+alwaysApply: true
+description: Context7 integration guidelines for documentation and library usage
+---
+
+# Context7 Integration Guidelines
+
+## When to Use Context7
+Always use Context7 for:
+- Looking up shadcn/ui component documentation and examples
+- Next.js 14+ App Router documentation
+- OpenAI API integration examples
+- React hooks and patterns
+- TypeScript best practices
+- Tailwind CSS utilities
+
+## Common Context7 Queries
+Use these types of queries when developing:
+
+### UI Components:
+- "shadcn button component examples"
+- "shadcn card component with TypeScript"
+- "shadcn dialog modal implementation"
+- "shadcn form validation patterns"
+
+### Next.js Development:
+- "Next.js 14 app router API routes"
+- "Next.js server components vs client components"
+- "Next.js TypeScript configuration"
+- "Next.js environment variables setup"
+
+### OpenAI Integration:
+- "OpenAI API chat completions with TypeScript"
+- "OpenAI API error handling best practices"
+- "OpenAI API streaming responses"
+- "OpenAI API rate limiting"
+
+### React Patterns:
+- "React useEffect cleanup patterns"
+- "React useState with TypeScript"
+- "React custom hooks examples"
+- "React error boundaries implementation"
+
+## Documentation Workflow
+1. Before implementing any feature, query Context7 for best practices
+2. Look up component documentation before using shadcn components
+3. Check API documentation before integrating external services
+4. Reference TypeScript patterns for type safety
+
+## Example Context7 Usage:
+```
+When implementing chat interface:
+1. Query: "shadcn card component for chat bubbles"
+2. Query: "React useEffect for real-time updates"
+3. Query: "OpenAI API streaming chat responses"
+4. Query: "Next.js API routes for chat endpoints"
+```
+
+This ensures you're using the most up-to-date patterns and best practices for the Perustamisapuri project.

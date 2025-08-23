@@ -1,0 +1,51 @@
+---
+alwaysApply: true
+description: UI component guidelines for Perustamisapuri project
+---
+
+# UI Component Guidelines for Perustamisapuri
+
+## Mandatory shadcn/ui Components
+Always use shadcn/ui components for all UI elements. Never create custom components when shadcn equivalents exist.
+
+### Required Components for This Project:
+- **Button**: Use `Button` for all clickable actions (login, export, chat send)
+- **Card**: Use `Card`, `CardHeader`, `CardContent` for profile sections and chat bubbles
+- **Input**: Use `Input` for text fields in onboarding and chat
+- **Dialog**: Use `Dialog` for modals and confirmations
+- **Avatar**: Use `Avatar` for user profile display
+- **Badge**: Use `Badge` for status indicators
+- **Separator**: Use `Separator` for visual divisions
+- **Textarea**: Use `Textarea` for multi-line inputs
+- **Select**: Use `Select` for dropdown menus
+- **Tabs**: Use `Tabs` for profile page sections
+
+### Installation Commands:
+```bash
+npx shadcn-ui@latest add button card input dialog avatar badge separator textarea select tabs
+```
+
+### Finnish UI Requirements:
+- All text must be in Finnish
+- Use proper Finnish typography and spacing
+- Follow accessibility guidelines (WCAG 2.1)
+- Ensure responsive design for mobile and desktop
+
+### Example Usage:
+```tsx
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+
+// Correct: Using shadcn components
+<Button variant="default">Kirjaudu sisään Suomi.fi</Button>
+<Card>
+  <CardHeader>Yrittäjäprofiili</CardHeader>
+  <CardContent>Profile content here</CardContent>
+</Card>
+
+// Incorrect: Custom button
+<button className="custom-btn">Login</button>
+```
+
+## Context7 Integration
+Use Context7 for documentation lookup and library references throughout development.
