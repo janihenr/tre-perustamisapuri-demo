@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Send, User, Bot, Trash2, RotateCcw } from "lucide-react";
 import Link from "next/link";
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   id: string;
@@ -325,12 +326,23 @@ Mistä aiheesta haluaisit keskustella?`,
                   : "bg-muted"
               }`}>
                 <CardContent className="p-3">
-                  <p className="whitespace-pre-wrap">
-                    {message.content}
-                    {streamingMessageId === message.id && (
-                      <span className="inline-block w-2 h-4 bg-current animate-pulse ml-1 align-text-bottom">|</span>
-                    )}
-                  </p>
+                  {message.role === "assistant" ? (
+                    <div className="whitespace-pre-wrap">
+                      <ReactMarkdown>
+                        {message.content}
+                      </ReactMarkdown>
+                      {streamingMessageId === message.id && (
+                        <span className="inline-block w-2 h-4 bg-current animate-pulse ml-1 align-text-bottom">|</span>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="whitespace-pre-wrap">
+                      {message.content}
+                      {streamingMessageId === message.id && (
+                        <span className="inline-block w-2 h-4 bg-current animate-pulse ml-1 align-text-bottom">|</span>
+                      )}
+                    </p>
+                  )}
                   <p className={`text-xs mt-2 opacity-70`}>
                     {message.timestamp.toLocaleTimeString('fi-FI', {
                       hour: '2-digit',

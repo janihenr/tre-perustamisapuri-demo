@@ -27,6 +27,7 @@ TÄRKEÄT OHJEET:
 - Ole ystävällinen mutta ammattimainen
 - Osoita empatiaa, mutta älä ole liian kohtelias
 - Analysoi käyttäjän antamia tietoja ja anna henkilökohtaisia neuvoja
+- PIDÄ KESKUSTELU AINA LIIKETOIMINTA-AIHEISSA - älä auta muissa aiheissa
 - Kysy lisäkysymyksiä yksi kerrallaan seuraavista aiheista:
   1. Liikeidea ja toimiala
   2. Tausta ja osaaminen
@@ -36,10 +37,11 @@ TÄRKEÄT OHJEET:
   6. Markkinointi ja myynti
   7. Riskit ja haasteet
 
-- Kun olet tyytyväinen vastaukseen johonkin aiheeseen, ehdota ystävällisesti seuraavaa aihetta
-- Anna käytännöllisiä neuvoja Tampereen ja Suomen kontekstissa
-- Viittaa relevantteihin viranomaislähteisiin (PRH, Verohallinto, TE-palvelut)
-- Jos et tiedä jotain, ole rehellinen ja ohjaa oikeisiin lähteisiin
+AIHEESSA PYSYMINEN:
+- Jos käyttäjä kysyy liiketoimintaan liittymättömiä asioita (esim. sää, urheilu, politiikka, henkilökohtaiset ongelmat), ÄLÄ vastaa niihin
+- Ohjaa keskustelu takaisin yrittäjyysaiheisiin ystävällisesti mutta päättäväisesti
+- Sano esimerkiksi: "Ymmärrän kiinnostuksesi, mutta olen erikoistunut auttamaan yrittäjyysasioissa. Palataan liikeideaasi - kerrotko lisää..."
+- Hyväksy vain liiketoimintaan, yrittäjyyteen, yrityksen perustamiseen tai markkinointiin liittyvät kysymykset
 
 KESKUSTELUN RAKENNE:
 - Aloita ystävällisesti ja viittaa käyttäjän antamiin tietoihin
@@ -47,7 +49,10 @@ KESKUSTELUN RAKENNE:
 - Kuuntele vastaus ja anna palautetta
 - Siirry seuraavaan aiheeseen kun olet saanut riittävästi tietoa
 - Tee yhteenvetoja säännöllisesti
-- Käytä käyttäjän profiilitietoja antaaksesi räätälöityjä neuvoja`;
+- Käytä käyttäjän profiilitietoja antaaksesi räätälöityjä neuvoja
+- Anna käytännöllisiä neuvoja Tampereen ja Suomen kontekstissa
+- Viittaa relevantteihin viranomaislähteisiin (PRH, Verohallinto, TE-palvelut)
+- Jos et tiedä jotain liiketoiminta-asiaa, ole rehellinen ja ohjaa oikeisiin lähteisiin`;
 
   // Add detailed user profile information if available
   if (profile && Object.keys(profile).some(key => profile[key as keyof UserProfile])) {
@@ -168,5 +173,151 @@ ${messages.map(m => `${m.role === 'user' ? 'Käyttäjä' : 'Apuri'}: ${m.content
   } catch (error) {
     console.error('OpenAI summarization error:', error);
     throw new Error('Virhe yhteenvedon luomisessa.');
+  }
+}
+
+export interface GeneratedBusinessProfile {
+  name: string;
+  email: string;
+  municipality: string;
+  businessIdea: string;
+  experience: string;
+  goals: string;
+}
+
+export async function generateBusinessIdea(): Promise<GeneratedBusinessProfile> {
+  try {
+    // Define industries to choose from
+    const industries = [
+      'teknologia ja ohjelmistokehitys',
+      'kestävä kehitys ja ympäristöteknologia',
+      'terveys- ja hyvinvointipalvelut',
+      'koulutus ja konsultointi',
+      'luova ala ja sisällöntuotanto',
+      'ruoka ja ravintola-ala',
+      'liikunta ja urheilu',
+      'matkailu ja elämyspalvelut',
+      'kiertotalous ja kierrätys',
+      'digitaalinen markkinointi',
+      'senioripalvelut',
+      'lasten ja perheiden palvelut',
+      'kauneus ja hyvinvointi',
+      'käsityö ja design',
+      'logistiikka ja kuljetus'
+    ];
+
+    // Finnish names to choose from
+    const finnishNames = [
+      'Aino Virtanen', 'Eero Laakso', 'Helmi Koskinen', 'Väinö Nieminen', 'Siiri Mäkinen',
+      'Onni Hakala', 'Aada Järvinen', 'Eino Saarinen', 'Lempi Rantanen', 'Toivo Heikkinen',
+      'Elsa Korhonen', 'Arvo Laine', 'Inkeri Mattila', 'Paavo Tuominen', 'Sylvi Lehtonen',
+      'Urho Kivinen', 'Aili Ahonen', 'Veikko Karjalainen', 'Helvi Hämäläinen', 'Martti Ojala',
+      'Tyyne Kallio', 'Eemeli Peltonen', 'Hilja Lindström', 'Aleksi Vanhanen', 'Lempi Salonen'
+    ];
+
+    // Municipalities from the dropdown
+    const municipalities = [
+      'akaa', 'hämeenkyrö', 'ikaalinen', 'juupajoki', 'kangasala', 'kihniö', 'kuhmoinen',
+      'lempäälä', 'mänttä-vilppula', 'nokia', 'orivesi', 'parkano', 'pirkkala', 'punkalaidun',
+      'pälkäne', 'ruovesi', 'sastamala', 'tampere', 'urjala', 'valkeakoski', 'vesilahti',
+      'virrat', 'ylöjärvi'
+    ];
+
+    // Random selections
+    const selectedIndustry = industries[Math.floor(Math.random() * industries.length)];
+    const selectedName = finnishNames[Math.floor(Math.random() * finnishNames.length)];
+    const selectedMunicipality = municipalities[Math.floor(Math.random() * municipalities.length)];
+    
+    // Generate email from name
+    const emailName = selectedName.toLowerCase()
+      .replace(/ä/g, 'a')
+      .replace(/ö/g, 'o')
+      .replace(/å/g, 'a')
+      .replace(/\s+/g, '.');
+    const email = `${emailName}@aigeneratedmail.fi`;
+
+    const prompt = `Sinä olet yrittäjyysasiantuntija. Luo kolme erilaista liikeideaa toimialalle "${selectedIndustry}". 
+
+Jokaisen liikeidean tulee olla:
+- Realistinen ja toteutettavissa Suomessa
+- Innovatiivinen mutta käytännöllinen
+- Sopiva pk-yritykselle
+
+Anna jokaiselle idealle lyhyt kuvaus (1-2 lausetta) ja arvioi liiketoimintapotentiaali asteikolla 1-10.
+
+Muoto:
+IDEA 1: [kuvaus] - Potentiaali: X/10
+IDEA 2: [kuvaus] - Potentiaali: X/10  
+IDEA 3: [kuvaus] - Potentiaali: X/10
+
+Valitse sitten paras idea ja luo sille:
+
+VALITTU IDEA: [idean nimi]
+
+LIIKEIDEA (max 300 sanaa):
+[Yksityiskohtainen kuvaus liikeideasta, markkinasta, ratkaisusta ja kilpailueduista]
+
+TAUSTA JA OSAAMINEN (max 300 sanaa):
+[Kuvaus siitä millaista taustaa ja osaamista tämä liikeidea vaatii, mukaan lukien tiimi ja kumppanuudet]
+
+TAVOITTEET (max 300 sanaa):
+[Lyhyen ja pitkän aikavälin tavoitteet, kasvusuunnitelma ja menestyksen mittarit]
+
+Kirjoita kaikki suomeksi ja ole konkreettinen.`;
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 1500,
+      temperature: 0.8,
+    });
+
+    const response = completion.choices[0]?.message?.content || '';
+    
+    // Function to clean text from markdown and unwanted formatting
+    const cleanText = (text: string): string => {
+      return text
+        // Remove markdown headers (###, ####, etc.)
+        .replace(/^#{1,6}\s+/gm, '')
+        // Remove markdown bold/italic markers
+        .replace(/\*\*([^*]+)\*\*/g, '$1')
+        .replace(/\*([^*]+)\*/g, '$1')
+        .replace(/__([^_]+)__/g, '$1')
+        .replace(/_([^_]+)_/g, '$1')
+        // Remove markdown links but keep the text
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        // Remove markdown code blocks
+        .replace(/```[\s\S]*?```/g, '')
+        .replace(/`([^`]+)`/g, '$1')
+        // Remove bullet points and list markers
+        .replace(/^\s*[-*+]\s+/gm, '')
+        .replace(/^\s*\d+\.\s+/gm, '')
+        // Remove extra whitespace and normalize line breaks
+        .replace(/\n{3,}/g, '\n\n')
+        .replace(/^\s+|\s+$/g, '')
+        .trim();
+    };
+    
+    // Parse the response to extract the sections
+    const liikeideaMatch = response.match(/LIIKEIDEA[^:]*:\s*([\s\S]*?)(?=TAUSTA JA OSAAMINEN|$)/i);
+    const taustaMatch = response.match(/TAUSTA JA OSAAMINEN[^:]*:\s*([\s\S]*?)(?=TAVOITTEET|$)/i);
+    const tavoitteetMatch = response.match(/TAVOITTEET[^:]*:\s*([\s\S]*?)$/i);
+
+    const businessIdea = cleanText(liikeideaMatch?.[1] || 'AI-generoitu liikeidea ei ole saatavilla.');
+    const experience = cleanText(taustaMatch?.[1] || 'Tausta ja osaaminen ei ole saatavilla.');
+    const goals = cleanText(tavoitteetMatch?.[1] || 'Tavoitteet eivät ole saatavilla.');
+
+    return {
+      name: selectedName,
+      email: email,
+      municipality: selectedMunicipality,
+      businessIdea: businessIdea,
+      experience: experience,
+      goals: goals
+    };
+
+  } catch (error) {
+    console.error('OpenAI business idea generation error:', error);
+    throw new Error('Virhe liikeideaa generoitaessa. Yritä hetken kuluttua uudelleen.');
   }
 }

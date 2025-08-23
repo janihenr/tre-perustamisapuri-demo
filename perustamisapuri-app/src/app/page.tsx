@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import Link from "next/link";
+
 import { useRouter } from "next/navigation";
 import { AlertCircle } from "lucide-react";
 
@@ -44,14 +44,12 @@ export default function Home() {
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-center">Kirjaudu sisään</CardTitle>
             <CardDescription className="text-center">
-              Käytä Suomi.fi-tunnuksia päästäksesi palveluun
+              Käytä sisäänkirjautumisavainta päästäksesi palveluun
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button asChild className="w-full" size="lg">
-              <Link href="/onboarding">
-                Kirjaudu sisään Suomi.fi
-              </Link>
+            <Button disabled className="w-full" size="lg">
+              Kirjaudu sisään Suomi.fi (ei käytössä)
             </Button>
             
             {/* Signin Key Input */}

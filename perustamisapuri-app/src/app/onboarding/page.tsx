@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Zap, Sparkles } from "lucide-react";
 
 export default function OnboardingPage() {
   const [formData, setFormData] = useState({
@@ -19,12 +19,82 @@ export default function OnboardingPage() {
     experience: "",
     goals: ""
   });
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Demo data constants
+  const demoData = {
+    name: "Matti Meikäläinen",
+    email: "matti.meikalanen@gmmmmai.com",
+    municipality: "lempäälä",
+    businessIdea: `Liikeideamme perustuu tekoälyä hyödyntävän älykkään automaatiopalvelualustan kehittämiseen pk-yrityksille. Useat pk-sektorin toimijat kamppailevat yhä erilaisten manuaalisten prosessien kanssa: tiedon syöttö, asiakaspalvelun rutiinit, raportointi ja dokumenttien hallinta vievät huomattavan määrän työaikaa, mikä vähentää aikaa varsinaiselle liiketoiminnalle. Meidän ratkaisumme yhdistää nämä tarpeet yhteen selkeään alustaan, joka toimii pilvipohjaisesti ja on helppo ottaa käyttöön ilman syvää teknistä osaamista.
+
+Palvelu hyödyntää uusinta luonnollisen kielen prosessointia (NLP) sekä RAG-mallinnusta, jolloin asiakkaan omat dokumentit, sopimukset ja ohjeistukset voidaan ottaa älykkään haun ja automaattisen sisällöntuotannon pohjaksi. Käytännössä tämä tarkoittaa, että yrityksen työntekijä voi kysyä alustalta kysymyksiä, kuten "Miten meillä raportoidaan matkakulut?" tai "Mitä velvoitteita GDPR tuo asiakastietojen käsittelyyn?", ja järjestelmä palauttaa täsmällisen vastauksen yrityksen sisäisiin käytäntöihin perustuen.
+
+Liikeideamme keskeinen vahvuus on helppokäyttöisyys ja skaalautuvuus: asiakas maksaa vain tarvitsemistaan ominaisuuksista, ja palvelua voi laajentaa modulaarisesti. Tarjoamme valmiita integraatioita yleisimpiin järjestelmiin (esim. O365, Google Workspace, CRM-järjestelmät) sekä avoimen rajapinnan, jotta alusta voidaan liittää osaksi asiakkaan omaa ekosysteemiä.
+
+Markkinassa on nähtävissä selkeä tarve kevyille mutta älykkäille automaatiotyökaluille, joiden kustannus on pk-yrityksille realistinen. Kansainvälinen kilpailu lisää painetta prosessien tehostamiseen, ja juuri tässä kohden meidän alustamme tuo ratkaisevan eron.`,
+    experience: `Yrityksemme tausta perustuu monipuoliseen IT- ja konsultointiosaamiseen. Tiimimme koostuu neljästä perustajasta, joilla jokaisella on yli kymmenen vuoden kokemus ohjelmistokehityksestä, data-analytiikasta ja tekoälyn hyödyntämisestä liiketoiminnassa. Olemme työskennelleet niin julkisen sektorin kuin yksityisen teollisuuden digitalisaatiohankkeissa, ja olemme nähneet läheltä, miten paljon potentiaalia yrityksillä olisi hyödyntää dataansa tehokkaammin.
+
+Yksi perustajista on erikoistunut pilviarkkitehtuureihin ja on sertifioitu Azure- ja AWS-ympäristöissä. Hänen osaamisensa mahdollistaa ratkaisumme turvallisen ja kustannustehokkaan toteutuksen pilvessä. Toisen perustajan vahvuus on koneoppimismallien rakentamisessa, erityisesti generatiivisen tekoälyn käytössä tiedonhakuun ja sisällöntuotantoon. Kolmannella perustajalla on taustaa käyttöliittymäsuunnittelussa ja saavutettavuusvaatimuksissa, mikä varmistaa, että tuotteemme on aidosti loppukäyttäjäystävällinen. Neljäs perustaja on työskennellyt pitkään liiketoiminnan kehityksessä ja ymmärtää syvällisesti pk-yritysten tarpeita.
+
+Olemme myös rakentaneet verkoston kumppaneista, joihin kuuluu esimerkiksi paikallisia tilitoimistoja ja IT-palveluyrityksiä, jotka voivat tarjota meille asiakaskontakteja ja pilotointimahdollisuuksia. Tämän ansiosta pystymme validoimaan ideamme todellisissa käyttöympäristöissä jo varhaisessa vaiheessa.
+
+Yhdistämällä teknisen osaamisen, liiketoimintaymmärryksen ja käytännön kokemuksen olemme ainutlaatuisessa asemassa kehittämään ratkaisun, joka on sekä teknisesti vahva että aidosti arvoa tuottava.`,
+    goals: `Ensimmäisen toimintavuoden päätavoitteemme on pilotointien onnistunut läpivienti viiden pk-yrityksen kanssa. Tämä antaa meille arvokasta palautetta ja mahdollistaa tuotteen jatkokehityksen asiakaslähtöisesti. Tavoitteena on saada vähintään kaksi näistä piloteista maksaviksi asiakkaiksi, jolloin liiketoimintamalli validoituu.
+
+Kolmen vuoden aikajänteellä tavoitteemme on saavuttaa 100 maksavaa asiakasta Suomessa. Tämä saavutetaan keskittymällä aluksi selkeisiin toimialoihin, kuten tilitoimistot, konsultointiyritykset ja luovan alan toimijat, joilla on paljon toistuvia dokumentaatio- ja raportointiprosesseja. Näillä markkinoilla ratkaisumme tuo suoraan mitattavaa hyötyä ajansäästön ja laadun paranemisen kautta.
+
+Viiden vuoden aikajänteellä tavoitteemme on kansainvälistyminen Pohjoismaihin. Tähän mennessä alustan perustoiminnallisuudet ovat kypsiä, ja voimme tarjota myös monikielisen tuen. Samalla haluamme kasvattaa modulaarisuutta: asiakas voi valita tarvitsemansa palvelut (chatbot, raportointityökalu, sopimushaku, laskenta). Tämä mahdollistaa joustavan hinnoittelumallin, joka tukee erilaisia yrityskokoja.
+
+Pitkällä aikavälillä tavoitteemme on asemoitua luotettavana tekoälyratkaisujen tarjoajana pk-yrityksille. Haluamme rakentaa maineen toimijana, joka tarjoaa selkeitä, helposti käyttöönotettavia ja kustannustehokkaita palveluja. Kasvun myötä tavoittelemme 20–30 hengen organisaatiota, jossa yhdistyvät vahva tuotekehitys ja asiakastuki.
+
+Liiketoiminnan tavoitteet eivät rajoitu vain liikevaihtoon, vaan myös asiakasarvon tuottamiseen: jokainen käyttöönotto vähentää manuaalista työtä ja parantaa työntekijöiden tyytyväisyyttä. Tämä on linjassa myös kestävän kehityksen tavoitteiden kanssa, kun työskentely tehostuu ja resurssit kohdentuvat paremmin arvoa luovaan tekemiseen.`
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real app, this would save to database
     localStorage.setItem('perustamisapuri-profile', JSON.stringify(formData));
     window.location.href = '/chat';
+  };
+
+  const handleDemoFill = () => {
+    setFormData(demoData);
+  };
+
+  const handleAIBusinessIdea = async () => {
+    setIsGenerating(true);
+    try {
+      const response = await fetch('/api/generate-business-idea', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        setFormData({
+          name: result.data.name,
+          email: result.data.email,
+          municipality: result.data.municipality,
+          businessIdea: result.data.businessIdea,
+          experience: result.data.experience,
+          goals: result.data.goals
+        });
+      } else {
+        console.error('AI generation failed:', result.error);
+        // Fallback to demo data if AI generation fails
+        setFormData(demoData);
+      }
+    } catch (error) {
+      console.error('Error generating business idea:', error);
+      // Fallback to demo data if there's an error
+      setFormData(demoData);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -59,6 +129,41 @@ export default function OnboardingPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Demo Buttons */}
+            <div className="mb-6 p-4 bg-muted/30 rounded-lg border border-muted-foreground/20">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-sm font-medium text-muted-foreground">Demo-toiminnot</span>
+                <Badge variant="secondary" className="text-xs">
+                  Testikäyttö
+                </Badge>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleDemoFill}
+                  className="flex-1 hover:bg-secondary/80"
+                >
+                  <Zap className="h-4 w-4 mr-2" />
+                  Täytä demotiedoilla
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleAIBusinessIdea}
+                  disabled={isGenerating}
+                  className="flex-1 hover:bg-secondary/80"
+                >
+                  <Sparkles className={`h-4 w-4 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
+                  {isGenerating ? 'Generoidaan...' : 'Generoi AI-liikeidea'}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Nämä painikkeet täyttävät lomakkeen esimerkkitiedoilla.
+              </p>
+            </div>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
