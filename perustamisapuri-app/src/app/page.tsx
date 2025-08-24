@@ -11,7 +11,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle } from "lucide-react";
 import { validateSecretKey, setAuthCookie, isAuthenticated } from "@/lib/auth";
 
-function HomeContent() {
+function HomeContentWithSearchParams() {
   const [signinKey, setSigninKey] = useState("");
   const [showErrorModal, setShowErrorModal] = useState(false);
   const router = useRouter();
@@ -132,14 +132,18 @@ function HomeContent() {
   );
 }
 
-export default function Home() {
+function HomeContent() {
   return (
     <Suspense fallback={
       <div className="container flex items-center justify-center min-h-[calc(100vh-3.5rem)] py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     }>
-      <HomeContent />
+      <HomeContentWithSearchParams />
     </Suspense>
   );
+}
+
+export default function Home() {
+  return <HomeContent />;
 }
