@@ -135,7 +135,7 @@ Liiketoiminnan tavoitteet eivät rajoitu vain liikevaihtoon, vaan myös asiakasa
         <div className="space-y-8">
           <div className="text-center">
             <h1 className="text-3xl font-bold tracking-tight">
-              Kerro itsestäsi
+              Kerro liikeideastasi
             </h1>
             <p className="mt-2 text-muted-foreground">
               Näiden tietojen avulla Perustamisapuri voi auttaa sinua paremmin
@@ -178,7 +178,7 @@ Liiketoiminnan tavoitteet eivät rajoitu vain liikevaihtoon, vaan myös asiakasa
                   className="flex-1 hover:bg-secondary/80"
                 >
                   <Sparkles className={`h-4 w-4 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
-                  {isGenerating ? 'Generoidaan...' : 'Generoi AI-liikeidea'}
+                  {isGenerating ? 'Generoidaan...' : 'Generoi demo-liikeidea'}
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground mt-2">
